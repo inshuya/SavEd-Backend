@@ -5,7 +5,9 @@ const Transactions = {};
 
 
 Transactions.getAll = (userId,month, result) => {
-  sql.query(`SELECT t.account_number, transaction_name, category, transaction_ts FROM transactions t JOIN accounts a ON t.account_number = a.account_number WHERE user_id = ${userId} and ${month} = MONTH(transaction_ts)`, (err, res) => {
+  sql.query(`SELECT t.account_number, transaction_name, category, transaction_ts FROM transactions t JOIN accounts a ON t.account_number = a.account_number 
+  WHERE user_id = ${userId} and MONTH('${month}') = MONTH(transaction_ts) AND YEAR('${month}') = YEAR(transaction_ts) AND transaction_ts <= NOW()
+  ORDER BY transaction_ts DESC`, (err, res) => {
     if (err) {
       console.log("error: ", err);
       result(err, null);
@@ -24,7 +26,9 @@ Transactions.getAll = (userId,month, result) => {
 };
 
 Transactions.getBills = (userId,month, result) => {
-  sql.query(`SELECT t.account_number, transaction_name, category, transaction_ts FROM transactions t JOIN accounts a ON t.account_number = a.account_number WHERE user_id = ${userId} and ${month} = MONTH(transaction_ts) and isExpense=1`, (err, res) => {
+  sql.query(`SELECT t.account_number, transaction_name, category, transaction_ts FROM transactions t JOIN accounts a ON t.account_number = a.account_number 
+  WHERE user_id = ${userId} and MONTH('${month}') = MONTH(transaction_ts) AND YEAR('${month}') = YEAR(transaction_ts) AND isExpense = 1 AND transaction_ts <= NOW()
+  ORDER BY transaction_ts DESC`, (err, res) => {
     if (err) {
       console.log("error: ", err);
       result(err, null);
@@ -43,7 +47,9 @@ Transactions.getBills = (userId,month, result) => {
 };
 
 Transactions.getIncome = (userId,month, result) => {
-  sql.query(`SELECT t.account_number, transaction_name, category, transaction_ts FROM transactions t JOIN accounts a ON t.account_number = a.account_number WHERE user_id = ${userId} and ${month} = MONTH(transaction_ts) and isExpense=0`, (err, res) => {
+  sql.query(`SELECT t.account_number, transaction_name, category, transaction_ts FROM transactions t JOIN accounts a ON t.account_number = a.account_number 
+  WHERE user_id = ${userId} and MONTH('${month}') = MONTH(transaction_ts) AND YEAR('${month}') = YEAR(transaction_ts) AND isExpense = 0 AND transaction_ts <= NOW()
+  ORDER BY transaction_ts DESC`, (err, res) => {
     if (err) {
       console.log("error: ", err);
       result(err, null);
