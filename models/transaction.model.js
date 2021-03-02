@@ -23,5 +23,43 @@ Transactions.getAll = (userId,month, result) => {
   });
 };
 
+Transactions.getBills = (userId,month, result) => {
+  sql.query(`SELECT t.account_number, transaction_name, category, transaction_ts FROM transactions t JOIN accounts a ON t.account_number = a.account_number WHERE user_id = ${userId} and ${month} = MONTH(transaction_ts) and isExpense=1`, (err, res) => {
+    if (err) {
+      console.log("error: ", err);
+      result(err, null);
+      return;
+    }
+
+    if (res.length) {
+      console.log("found transactions: ", res);
+      result(null, res);
+      return;
+    }
+
+    // not found scenario with the id
+    result({ kind: "not_found" }, null);
+  });
+};
+
+Transactions.getIncome = (userId,month, result) => {
+  sql.query(`SELECT t.account_number, transaction_name, category, transaction_ts FROM transactions t JOIN accounts a ON t.account_number = a.account_number WHERE user_id = ${userId} and ${month} = MONTH(transaction_ts) and isExpense=0`, (err, res) => {
+    if (err) {
+      console.log("error: ", err);
+      result(err, null);
+      return;
+    }
+
+    if (res.length) {
+      console.log("found transactions: ", res);
+      result(null, res);
+      return;
+    }
+
+    // not found scenario with the id
+    result({ kind: "not_found" }, null);
+  });
+};
+
 
 module.exports = Transactions;
