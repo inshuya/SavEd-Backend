@@ -6,11 +6,11 @@ const Expense = {};
 
 Expense.getBalance = (userId,month, result) => {
     let q = ` SELECT
-    (SELECT SUM(spend_limit) FROM category_goal WHERE user_id = ${userId} and MONTH('${month}') = goal_month AND YEAR('${month}') = goal_year AND is_expense=1) as limitt,
+    (SELECT SUM(spend_limit) FROM category_goal WHERE user_id = ${userId} and MONTH('${month}') = goal_month AND YEAR('${month}') = goal_year AND is_expense=1 AND goal_month<=MONTH(NOW()) AND goal_year<=YEAR(NOW())) as limitt,
     (SELECT SUM(amount) FROM
     (SELECT SUM(amount) as amount,category_id  FROM transactions t JOIN accounts a ON t.account_number = a.account_number WHERE user_id = ${userId} and MONTH('${month}') = MONTH(transaction_ts) AND YEAR('${month}') = YEAR(transaction_ts) AND transaction_ts <= NOW()
     GROUP BY category_id) t
-    JOIN (SELECT DISTINCT category_id,category_name,user_id FROM category_goal  WHERE user_id = ${userId} and MONTH('${month}') = goal_month AND YEAR('${month}') = goal_year AND is_expense=1) c
+    JOIN (SELECT DISTINCT category_id,category_name,user_id FROM category_goal  WHERE user_id = ${userId} and MONTH('${month}') = goal_month AND YEAR('${month}') = goal_year AND is_expense=1 AND goal_month<=MONTH(NOW()) AND goal_year<=YEAR(NOW())) c
     ON t.category_id = c.category_id  )
     AS used`;
     sql.query(q, (err, res) => {
